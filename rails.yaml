@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rails-example-app-sidekiq
+spec:
+  selector:
+    matchLabels:
+      app: rails-example-app
+      tier: sidekiq
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rails-example-app
+        tier: sidekiq
+    spec:
+        containers:
+        - name: seanrclayton
+          image: seanrclayton/blank_rails_app:latest
+          ports:
+          - containerPort: 3000
+        imagePullSecrets:
+        - name: registrypullsecret
