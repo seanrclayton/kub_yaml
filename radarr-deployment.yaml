@@ -1,0 +1,70 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: radarr
+  name: radarr
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: radarr
+    spec:
+      containers:
+      - image: linuxserver/radarr:latest
+        name: radarr
+        ports:
+        - containerPort: 7878
+        volumeMounts:
+          - mountPath: /config
+            name: big-drive
+          - mountPath: /downloads
+            name: downloads
+          - mountPath: /movies
+            name: movies
+        env:
+         - name: XDG_CONFIG_HOME
+           value: '/mnt'
+        resources: {}
+      restartPolicy: Always
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+          - 8.8.4.4
+        searches:
+          - ns1.svc.cluster.local
+          - my.dns.search.suffix
+      volumes:
+        - name: big-drive
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/radarr"
+              mountOptions: "dir_mode=0755,file_mode=0777,noperm,nobrl"
+        - name: movies
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/Movies"
+              mountOptions: "dir_mode=0755,file_mode=0777,noperm,nobrl"
+        - name: downloads
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/Downloads"
+              mountOptions: "dir_mode=0755,file_mode=0777,noperm,nobrl"
+
+status: {}

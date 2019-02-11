@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: jackett
+  name: jackett
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: jackett
+    spec:
+      containers:
+      - image: linuxserver/jackett:latest
+        name: jackett
+        ports:
+        - containerPort: 9117
+        volumeMounts:
+          - mountPath: /mnt
+            name: big-drive
+        env:
+         - name: XDG_CONFIG_HOME
+           value: '/mnt'
+        resources: {}
+      restartPolicy: Always
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+          - 8.8.4.4
+        searches:
+          - ns1.svc.cluster.local
+          - my.dns.search.suffix
+      volumes:
+        - name: big-drive
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/public"
+              mountOptions: "dir_mode=0755,file_mode=0644,noperm"
+status: {}

@@ -1,0 +1,70 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sonarr
+  name: sonarr
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sonarr
+    spec:
+      containers:
+      - image: linuxserver/sonarr:latest
+        name: sonarr
+        ports:
+        - containerPort: 8989
+        volumeMounts:
+          - mountPath: /config
+            name: sonarr
+          - mountPath: /tv
+            name: tv
+          - mountPath: /downloads
+            name: downloads
+        env:
+         - name: XDG_CONFIG_HOME
+           value: '/mnt'
+        resources: {}
+      restartPolicy: Always
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+          - 8.8.4.4
+        searches:
+          - ns1.svc.cluster.local
+          - my.dns.search.suffix
+      volumes:
+        - name: sonarr
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/sonarr"
+              mountOptions: "dir_mode=0755,file_mode=0777,noperm,nobrl"
+        - name: tv
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/TV"
+              mountOptions: "dir_mode=0755,file_mode=0777,noperm,nobrl"
+        - name: downloads
+          flexVolume:
+            driver: "fstab/cifs"
+            secretRef:
+              name: "cifs-secret"
+            options:
+              networkPath: "//192.168.0.3/Downloads"
+              mountOptions: "dir_mode=0755,file_mode=0777,noperm,nobrl"
+
+status: {}
