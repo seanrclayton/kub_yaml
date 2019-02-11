@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pia-and-deluge
+  labels: 
+    app: pia-and-deluge
+spec:
+  containers:
+  - name: pia 
+    env:
+          - name: ENCRYPTION
+            value: strong
+          - name: EXTRA_SUBNETS
+          - name: PASSWORD
+            value: redacted
+          - name: PROTOCOL
+            value: udp
+          - name: REGION
+            value: US Seattle
+          - name: USER
+            value: redacted
+    image: qmcgaw/private-internet-access
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+          - NET_ADMIN
+    volumeMounts:
+      - mountPath: /dev/net/tun
+        name: dev-net-tun
+  - name: deluge 
+    image: linuxserver/deluge
+    livenessProbe:
+      httpGet:
+        path: /healthcheck
+        port: 80
+      initialDelaySeconds: 3
+      periodSeconds: 3
+    ports: 
+      - containerPort: 8112
+    volumeMounts:
+      - mountPath: /mnt
+        name: big-drive
+  - name: flash-healthcheck
+    image: seanrclayton/flask
+    ports:
+      - containerPort: 80
+  dnsConfig:
+    nameservers:
+      - 8.8.8.8
+      - 8.8.4.4
+    searches:
+      - ns1.svc.cluster.local
+      - my.dns.search.suffix
+  volumes:
+  - hostPath:
+      path: /dev/net/tun
+    name: dev-net-tun
+  - flexVolume:
+      driver: "fstab/cifs"
+      secretRef:
+        name: "cifs-secret"
+      options:
+        mountOptions: "dir_mode=0755,file_mode=0644"
+        networkPath: "//192.168.0.3/public"
+    name: big-drive
