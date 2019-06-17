@@ -5,8 +5,7 @@ metadata:
 spec:
   selector:
     app: rails-example-app 
-  type: NodePort
-  #type: LoadBalancer
+  type: LoadBalancer
   ports:
   - name: http
     protocol: TCP
