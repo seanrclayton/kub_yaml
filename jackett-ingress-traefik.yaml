@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: jackett-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: ladybug.home
+    http:
+      paths:
+      - path: /jackett
+        backend:
+          serviceName: jackett
+          servicePort: 9117

@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: radarr-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: ladybug.home
+    http:
+      paths:
+      - path: /movies
+        backend:
+          serviceName: radarr
+          servicePort: 7878 
