@@ -1,0 +1,14 @@
+#kubectl label nodes <node-name> env=test
+#https://stackoverflow.com/questions/52487333/how-to-assign-a-namespace-to-certain-nodes
+#Edit /etc/kubernetes/manifests/kube-apiserver.yaml
+#--enable-admission-plugins=
+#add PodNodeSelector parameter
+# delete api server pod 
+apiVersion: v1
+kind: Namespace
+metadata:
+ name: ns1
+ annotations:
+   scheduler.alpha.kubernetes.io/node-selector: env=test
+spec: {}
+status: {}
