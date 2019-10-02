@@ -1,0 +1,34 @@
+#Use the following YAMLs to create a cStor Storage Pool.
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: cstor-disk-pool
+  annotations:
+    cas.openebs.io/config: |
+      - name: PoolResourceRequests
+        value: |-
+            memory: 2Gi
+      - name: PoolResourceLimits
+        value: |-
+            memory: 4Gi
+spec:
+  name: cstor-disk-pool
+  type: disk
+  poolSpec:
+    poolType: striped
+  blockDevices:
+    blockDeviceList:
+    - blockdevice-810fe3496b1133eaaacccae665c02068
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-cstor-disk
+  annotations:
+    openebs.io/cas-type: cstor
+    cas.openebs.io/config: |
+      - name: StoragePoolClaim
+        value: "cstor-disk-pool"
+      - name: ReplicaCount
+        value: "1"
+provisioner: openebs.io/provisioner-iscsi
