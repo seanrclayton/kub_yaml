@@ -2,7 +2,9 @@ apiVersion: kubedb.com/v1alpha1
 kind: MongoDB
 metadata:
   name: mgo-replicaset
-  namespace: ns1
+  namespace: openebs
+  nodeSelector:
+    openebs: true
 spec:
   version: "3.6-v3"
   replicas: 1
