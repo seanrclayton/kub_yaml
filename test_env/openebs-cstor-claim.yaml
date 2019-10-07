@@ -18,6 +18,7 @@ spec:
     poolType: striped
   blockDevices:
     blockDeviceList:
+    # block device is unused un mounted by target (eg external drive on laptop) kubectl get block device / describe block device
     - blockdevice-810fe3496b1133eaaacccae665c02068
 ---
 apiVersion: storage.k8s.io/v1
