@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app
+  labels:
+    app: node-app
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+      - args:
+        - npm
+        - start
+        env:
+        - name: NODE_ENV
+          value: production
+        image: node:8
+        name: node-app
+        resources: {}
+        imagePullPolicy: IfNotPresent
+        ports:
+         - containerPort: 3306
+           name: node-app
+        volumeMounts:
+        - mountPath: /var/lib/
+          name: demo-vol1
+        - mountPath: /var/lib/node
+          name: git-volume
+        workingDir: /var/lib/node
+      volumes:
+      - name: git-volume
+        gitRepo: 
+          repository: "https://github.com/seanrclayton/node.git" 
+      - name: demo-vol1
+        persistentVolumeClaim:
+          claimName: demo-vol1-claim
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-vol1-claim
+spec:
+  storageClassName: openebs-cstor-disk
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+status: {}
+
+

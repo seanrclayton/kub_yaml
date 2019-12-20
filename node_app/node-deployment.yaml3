@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app
+  labels:
+    app: node-app
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+        - name: node-app
+          image: node:8
+          command: ['npm']
+          args: ['install','run']
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /var/lib/
+            name: git-volume
+          ports:
+          - containerPort: 8080
+        workingDir: /var/lib/node
+        env:
+        - name: NODE_ENV
+          value: production
+        volumes:
+        - name: git-volume
+        gitRepo: 
+          repository: "https://github.com/seanrclayton/node.git" 

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-app
+  labels:
+    app: node-app
+spec:
+  containers:
+  - name: node-app
+    image: node:8
+    env:
+    - name: NODE_ENV
+      value: production
+    resources: {}
+    imagePullPolicy: IfNotPresent
+    ports:
+     - containerPort: 3306
+       name: node-app
+    volumeMounts:
+    - mountPath: /var/lib/
+      name: git-volume
+    workingDir: /var/lib/node
+    command: ["/bin/sh","-c"]
+    args: ['cd /var/lib/node; npm install; npm run start']
+  volumes:
+  - name: git-volume
+    gitRepo: 
+      repository: "https://github.com/seanrclayton/node.git" 
